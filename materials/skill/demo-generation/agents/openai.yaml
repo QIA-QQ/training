@@ -1,0 +1,4 @@
+interface:
+  display_name: "demo-generation"
+  short_description: "Turn requirement docs into confirmed demo build specs."
+  default_prompt: "Use $demo-spec-to-build to turn this requirement document into a development specification before building the demo."
