@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>商品选择弹窗-套系列表 PRD</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+<style>
+  :root {
+    --bg: #f8f9fa;
+    --card-bg: #ffffff;
+    --text: #1a1a2e;
+    --text-secondary: #555;
+    --border: #e0e0e0;
+    --accent: #2563eb;
+    --accent-light: #eff6ff;
+    --tag-bg: #f0fdf4;
+    --tag-text: #166534;
+    --tag-out-bg: #fff7ed;
+    --tag-out-text: #9a3412;
+    --radius: 8px;
+    --shadow: 0 1px 3px rgba(0,0,0,.08);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    font-size: 15px;
+  }
+  .container { max-width: 960px; margin: 0 auto; padding: 40px 24px 80px; }
+
+  h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; letter-spacing: -.5px; }
+  h2 { font-size: 22px; font-weight: 600; margin: 48px 0 20px; padding-bottom: 10px; border-bottom: 2px solid var(--accent); }
+  h3 { font-size: 18px; font-weight: 600; margin: 32px 0 14px; }
+  h4 { font-size: 16px; font-weight: 600; margin: 24px 0 10px; color: var(--text-secondary); }
+
+  .meta { color: var(--text-secondary); font-size: 14px; margin-bottom: 32px; }
+  .meta span { margin-right: 20px; }
+
+  p { margin: 12px 0; }
+  ul, ol { margin: 10px 0 10px 20px; }
+  li { margin: 6px 0; }
+  strong { color: #111; }
+
+  blockquote {
+    margin: 16px 0;
+    padding: 12px 16px;
+    border-left: 4px solid #f59e0b;
+    background: #fffbeb;
+    border-radius: 0 var(--radius) var(--radius) 0;
+    color: #92400e;
+    font-size: 14px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  th, td {
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+  }
+  th { background: #f1f5f9; font-weight: 600; color: #334155; }
+  tr:last-child td { border-bottom: none; }
+
+  .card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 24px;
+    margin: 20px 0;
+  }
+
+  .mermaid-wrap {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 28px 20px;
+    margin: 20px 0;
+    overflow-x: auto;
+    text-align: center;
+  }
+  .mermaid-wrap .mermaid { display: flex; justify-content: center; }
+  .product-swimlane-wrap {
+    background: var(--card-bg); border-radius: var(--radius); box-shadow: var(--shadow);
+    padding: 20px; margin: 20px 0; overflow-x: auto;
+  }
+  .product-swimlane { width: 100%; min-width: 760px; height: auto; display: block; }
+  .product-swimlane .lane-bg { fill: #f8fafc; stroke: #dbe3ef; stroke-width: 1.5; }
+  .product-swimlane .lane-head-user { fill: #eaf2ff; stroke: #2563eb; stroke-width: 1.5; }
+  .product-swimlane .lane-head-system { fill: #ecfdf8; stroke: #078c7f; stroke-width: 1.5; }
+  .product-swimlane .node-user { fill: #eff6ff; stroke: #2563eb; stroke-width: 1.5; }
+  .product-swimlane .node-system { fill: #effaf8; stroke: #078c7f; stroke-width: 1.5; }
+  .product-swimlane .node-decision { fill: #fff7ed; stroke: #d97904; stroke-width: 1.5; }
+  .product-swimlane .lane-title { fill: #17202a; font-size: 20px; font-weight: 700; text-anchor: middle; }
+  .product-swimlane .node-text { fill: #17202a; font-size: 15px; font-weight: 600; text-anchor: middle; }
+  .product-swimlane .node-subtext { fill: #52606d; font-size: 13px; text-anchor: middle; }
+  .product-swimlane .flow-line { fill: none; stroke: #64748b; stroke-width: 2; marker-end: url(#productArrow); }
+  .product-swimlane .flow-label { fill: #475569; font-size: 13px; font-weight: 600; }
+
+  .scope-tags { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0; }
+  .scope-tag-in { background: var(--accent-light); color: var(--accent); padding: 4px 12px; border-radius: 100px; font-size: 13px; font-weight: 500; }
+  .scope-tag-out { background: var(--tag-out-bg); color: var(--tag-out-text); padding: 4px 12px; border-radius: 100px; font-size: 13px; font-weight: 500; }
+
+  .checklist { list-style: none; margin-left: 0; }
+  .checklist li { padding: 8px 0 8px 28px; position: relative; border-bottom: 1px solid #f1f5f9; }
+  .checklist li::before { content: "☐"; position: absolute; left: 0; color: #94a3b8; font-size: 16px; }
+  .checklist li:last-child { border-bottom: none; }
+
+  .field-table th:first-child, .field-table td:first-child { font-family: "SF Mono", "Cascadia Code", "Consolas", monospace; font-size: 13px; color: var(--accent); }
+
+  hr { border: none; border-top: 1px solid var(--border); margin: 32px 0; }
+
+  .toc { background: var(--card-bg); border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px 24px; margin-bottom: 36px; }
+  .toc h3 { margin-top: 0; font-size: 15px; color: var(--text-secondary); }
+  .toc ol { margin: 8px 0 0 18px; }
+  .toc a { color: var(--accent); text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+
+  .img-placeholder {
+    display: flex; align-items: center; justify-content: center;
+    height: 120px; background: #f1f5f9; border: 2px dashed #cbd5e1;
+    border-radius: var(--radius); margin: 16px 0;
+    color: #94a3b8; font-size: 14px;
+  }
+
+  .ui-wireframe {
+    background: #fff; border: 1px solid #cbd5e1; border-radius: 12px;
+    box-shadow: var(--shadow); padding: 16px; margin: 20px 0;
+  }
+  .wf-header, .wf-footer, .suite-header {
+    display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  }
+  .wf-title { font-weight: 700; font-size: 16px; }
+  .wf-search { flex: 0 1 360px; padding: 9px 12px; border: 1px solid #cbd5e1; border-radius: 6px; color: #64748b; }
+  .wf-tabs { display: flex; gap: 22px; margin: 14px 0 0; border-bottom: 1px solid #e2e8f0; }
+  .wf-tab { padding: 8px 4px; color: #64748b; }
+  .wf-tab.active { color: var(--accent); border-bottom: 2px solid var(--accent); font-weight: 600; }
+  .wf-body { min-height: 160px; display: grid; place-items: center; margin: 14px 0; background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 8px; color: #64748b; text-align: center; }
+  .wf-footer { border-top: 1px solid #e2e8f0; padding-top: 12px; }
+  .wf-picked { color: #64748b; }
+  .wf-button { background: var(--accent); color: #fff; padding: 8px 22px; border-radius: 6px; font-weight: 600; }
+  .wf-button.disabled { background: #cbd5e1; }
+  .suite-wireframe { background: #fff; border: 1px solid #cbd5e1; border-radius: 10px; padding: 16px; margin: 18px 0; box-shadow: var(--shadow); }
+  .suite-id { color: #64748b; font-size: 13px; }
+  .sku-strip { display: grid; grid-template-columns: repeat(4, minmax(120px, 1fr)); gap: 10px; margin-top: 14px; overflow-x: auto; }
+  .sku-mini { min-width: 120px; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px; background: #f8fafc; }
+  .sku-image { height: 64px; display: grid; place-items: center; background: #e2e8f0; border-radius: 5px; color: #64748b; position: relative; }
+  .sku-main { position: absolute; left: 5px; top: 5px; padding: 1px 5px; border-radius: 4px; background: #f59e0b; color: #fff; font-size: 11px; }
+  .sku-check { position: absolute; right: 5px; top: 5px; width: 18px; height: 18px; border-radius: 50%; background: var(--accent); color: #fff; display: grid; place-items: center; font-size: 11px; }
+  .sku-spec { margin-top: 6px; color: #475569; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .swimlane-chart { background: #fff; border: 1px solid #dbe3ef; border-radius: 10px; padding: 14px; margin: 20px 0; box-shadow: var(--shadow); overflow-x: auto; }
+  .swimlane-table { min-width: 860px; margin: 0; box-shadow: none; border-radius: 0; }
+  .swimlane-table th { text-align: center; font-size: 12px; color: #475569; }
+  .swimlane-table th:first-child, .swimlane-table td:first-child { width: 105px; font-weight: 700; text-align: center; background: #eef2ff; color: #3730a3; }
+  .swimlane-table td { vertical-align: middle; text-align: center; padding: 9px 7px; font-size: 12px; line-height: 1.4; }
+  .swimlane-table .step-cell { background: #fafaff; color: #312e81; }
+  .swimlane-table .empty-cell { background: #f8fafc; color: #cbd5e1; }
+  .step-no { display: inline-grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: #4f46e5; color: #fff; font-size: 11px; font-weight: 700; margin-bottom: 4px; }
+
+  @media (max-width: 640px) {
+    .container { padding: 20px 14px 60px; }
+    h1 { font-size: 22px; }
+    h2 { font-size: 18px; }
+    table { font-size: 13px; }
+    th, td { padding: 8px 10px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>商品选择弹窗-套系列表 PRD</h1>
+<div class="meta">
+  <span>📅 2026-07-01</span>
+  <span>📌 版本 v1.0</span>
+  <span>🏷️ 状态：待评审</span>
+</div>
+
+<div class="toc">
+  <h3>📑 目录</h3>
+  <ol>
+    <li><a href="#s1">背景与目标</a></li>
+    <li><a href="#s2">需求范围</a></li>
+    <li><a href="#s3">产品流程</a></li>
+    <li><a href="#s4">功能需求</a></li>
+    <li><a href="#s5">验收标准</a></li>
+  </ol>
+</div>
+
+<!-- ===== 1. 背景与目标 ===== -->
+<h2 id="s1">1. 背景与目标</h2>
+
+<h3>1.1 背景</h3>
+<p>当前商品选择弹窗仅支持「单品选择」模式：用户逐个搜索、浏览单品 SKU 并勾选。业务上存在大量以"套系"为单位组织商品（如卧室套组、客餐厅套组），用户需要能按套系快速浏览并从中选取所需商品。</p>
+
+<h3>1.2 目标</h3>
+<p>在商品选择弹窗内新增「套系列表」tab，用户可直接查看套系及其包含的商品 SKU，从套系中勾选所需商品，提升选品效率。</p>
+
+<!-- ===== 2. 需求范围 ===== -->
+<h2 id="s2">2. 需求范围</h2>
+
+<h3>2.1 本期包含</h3>
+
+<div class="card">
+  <table>
+    <tr><th>范围模块</th><th>本期交付内容</th></tr>
+    <tr><td>套系 tab</td><td>Tab 切换、套系卡片列表、SKU 横向浏览、搜索过滤、SKU 勾选/取消</td></tr>
+    <tr><td>底部操作栏</td><td>已选缩略图展示、确定按钮数量与可用状态联动</td></tr>
+    <tr><td>数据层</td><td>套系 API 加载、缓存、Loading、失败兜底与重试</td></tr>
+  </table>
+</div>
+
+<div class="scope-tags">
+  <span class="scope-tag-in">✅ 套系 tab 新增</span>
+  <span class="scope-tag-in">✅ 套系卡片 + SKU 滚动条</span>
+  <span class="scope-tag-in">✅ SKU 勾选 / 取消</span>
+  <span class="scope-tag-in">✅ 搜索过滤</span>
+  <span class="scope-tag-in">✅ API 数据加载 + 兜底</span>
+  <span class="scope-tag-in">✅ 确定按钮联动</span>
+</div>
+
+<h3>2.2 本期不包含</h3>
+
+<div class="scope-tags">
+  <span class="scope-tag-out">❌ 套系数据后台管理</span>
+  <span class="scope-tag-out">❌ 分页 / 无限滚动</span>
+  <span class="scope-tag-out">❌ 单品 tab 功能修改</span>
+  <span class="scope-tag-out">❌ 系统推荐搭配区域改动</span>
+</div>
+
+<!-- ===== 3. 产品流程 ===== -->
+<h2 id="s3">3. 产品流程</h2>
+
+<h3>3.1 弹窗整体结构</h3>
+<div class="ui-wireframe" aria-label="商品选择弹窗页面结构示意">
+  <div class="wf-header"><span class="wf-title">选择商品</span><span class="wf-search">搜索商品名称 / 商品 ID</span></div>
+  <div class="wf-tabs"><span class="wf-tab active">单品选择</span><span class="wf-tab">套系列表</span></div>
+  <div class="wf-body">列表区域<br><small>单品 tab 展示商品卡片网格；套系 tab 展示套系卡片列表</small></div>
+  <div class="wf-footer"><span class="wf-picked">已选区（缩略图）</span><span class="wf-button disabled">确定</span></div>
+</div>
+
+<h3>3.2 套系 tab 完整操作流程</h3>
+<div class="swimlane-chart" aria-label="套系 tab 完整操作泳道图">
+  <table class="swimlane-table">
+    <tr><th>角色 / 阶段</th><th>进入弹窗</th><th>切换 tab</th><th>加载数据</th><th>浏览与搜索</th><th>选择商品</th><th>确认提交</th></tr>
+    <tr>
+      <td>用户</td>
+      <td class="step-cell"><span class="step-no">1</span><br>打开商品选择弹窗</td>
+      <td class="step-cell"><span class="step-no">3</span><br>点击「套系列表」</td>
+      <td class="empty-cell">—</td>
+      <td class="step-cell"><span class="step-no">7</span><br>搜索或浏览套系</td>
+      <td class="step-cell"><span class="step-no">9</span><br>勾选 / 取消 SKU</td>
+      <td class="step-cell"><span class="step-no">11</span><br>点击确定</td>
+    </tr>
+    <tr>
+      <td>商品选择弹窗 / 前端</td>
+      <td class="step-cell"><span class="step-no">2</span><br>默认展示单品 tab</td>
+      <td class="step-cell"><span class="step-no">4</span><br>切换 tab，清空搜索并更新文案</td>
+      <td class="step-cell"><span class="step-no">5</span><br>读取缓存；无缓存则请求套系数据</td>
+      <td class="step-cell"><span class="step-no">8</span><br>渲染或过滤列表；无匹配展示空状态</td>
+      <td class="step-cell"><span class="step-no">10</span><br>校验数量上限，同步卡片与已选区</td>
+      <td class="step-cell"><span class="step-no">12</span><br>组装统一的已选 SKU 数据</td>
+    </tr>
+    <tr>
+      <td>套系服务</td>
+      <td class="empty-cell">—</td><td class="empty-cell">—</td>
+      <td class="step-cell"><span class="step-no">6</span><br>返回套系与 SKU；失败时返回错误信息</td>
+      <td class="empty-cell">—</td><td class="empty-cell">—</td><td class="empty-cell">—</td>
+    </tr>
+    <tr>
+      <td>后续搭图流程</td>
+      <td class="empty-cell">—</td><td class="empty-cell">—</td><td class="empty-cell">—</td><td class="empty-cell">—</td><td class="empty-cell">—</td>
+      <td class="step-cell"><span class="step-no">13</span><br>接收已选 SKU，继续搭图</td>
+    </tr>
+  </table>
+</div>
+
+<h3>3.3 套系搭配品选择泳道图</h3>
+<div class="product-swimlane-wrap">
+<svg class="product-swimlane" viewBox="0 0 920 1300" role="img" aria-labelledby="product-swimlane-title product-swimlane-desc">
+  <title id="product-swimlane-title">用户使用套系列表选择搭配品的双泳道流程</title>
+  <desc id="product-swimlane-desc">流程在用户与系统两个角色之间往返，覆盖进入商品选择、切换套系列表、浏览搜索、勾选调整、确认并进入搭图的完整闭环。</desc>
+  <defs>
+    <marker id="productArrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#64748b"></path>
+    </marker>
+  </defs>
+
+  <rect class="lane-bg" x="20" y="70" width="420" height="1210" rx="10"></rect>
+  <rect class="lane-bg" x="480" y="70" width="420" height="1210" rx="10"></rect>
+  <rect class="lane-head-user" x="20" y="20" width="420" height="54" rx="10"></rect>
+  <rect class="lane-head-system" x="480" y="20" width="420" height="54" rx="10"></rect>
+  <text class="lane-title" x="230" y="55">用户</text>
+  <text class="lane-title" x="690" y="55">系统</text>
+
+  <rect class="node-user" x="90" y="95" width="280" height="52" rx="26"></rect>
+  <text class="node-text" x="230" y="127">需要从套系中选择搭配品</text>
+
+  <rect class="node-user" x="90" y="175" width="280" height="60" rx="8"></rect>
+  <text class="node-text" x="230" y="202"><tspan x="230">在搭图流程中打开</tspan><tspan x="230" dy="21">「选择商品」</tspan></text>
+
+  <rect class="node-system" x="550" y="265" width="280" height="64" rx="8"></rect>
+  <text class="node-text" x="690" y="291"><tspan x="690">打开商品选择弹窗</tspan><tspan class="node-subtext" x="690" dy="22">默认显示「单品选择」</tspan></text>
+
+  <rect class="node-user" x="90" y="355" width="280" height="56" rx="8"></rect>
+  <text class="node-text" x="230" y="389">点击「套系列表」</text>
+
+  <rect class="node-system" x="550" y="445" width="280" height="66" rx="8"></rect>
+  <text class="node-text" x="690" y="472"><tspan x="690">展示套系卡片</tspan><tspan class="node-subtext" x="690" dy="22">以及每个套系包含的 SKU</tspan></text>
+
+  <rect class="node-user" x="90" y="535" width="280" height="56" rx="8"></rect>
+  <text class="node-text" x="230" y="569">浏览套系或输入关键词</text>
+
+  <rect class="node-system" x="550" y="625" width="280" height="66" rx="8"></rect>
+  <text class="node-text" x="690" y="652"><tspan x="690">展示或过滤套系列表</tspan><tspan class="node-subtext" x="690" dy="22">无结果时展示空状态</tspan></text>
+
+  <rect class="node-user" x="90" y="715" width="280" height="56" rx="8"></rect>
+  <text class="node-text" x="230" y="749">勾选或取消需要的搭配品 SKU</text>
+
+  <rect class="node-system" x="550" y="805" width="280" height="76" rx="8"></rect>
+  <text class="node-text" x="690" y="833"><tspan x="690">更新选中态与底部已选区</tspan><tspan class="node-subtext" x="690" dy="22">达到上限时提示，原选择不变</tspan></text>
+
+  <polygon class="node-decision" points="230,895 340,940 230,985 120,940"></polygon>
+  <text class="node-text" x="230" y="945">是否继续调整？</text>
+
+  <rect class="node-user" x="90" y="1030" width="280" height="58" rx="8"></rect>
+  <text class="node-text" x="230" y="1065">点击底部「确定」</text>
+
+  <rect class="node-system" x="550" y="1120" width="280" height="66" rx="8"></rect>
+  <text class="node-text" x="690" y="1147"><tspan x="690">关闭弹窗</tspan><tspan class="node-subtext" x="690" dy="22">将已选 SKU 带入搭图流程</tspan></text>
+
+  <rect class="node-user" x="90" y="1220" width="280" height="52" rx="26"></rect>
+  <text class="node-text" x="230" y="1252">完成搭配品选择，继续搭图</text>
+
+  <path class="flow-line" d="M230 147 L230 175"></path>
+  <path class="flow-line" d="M370 205 H690 V265"></path>
+  <path class="flow-line" d="M550 297 H230 V355"></path>
+  <path class="flow-line" d="M370 383 H690 V445"></path>
+  <path class="flow-line" d="M550 478 H230 V535"></path>
+  <path class="flow-line" d="M370 563 H690 V625"></path>
+  <path class="flow-line" d="M550 658 H230 V715"></path>
+  <path class="flow-line" d="M370 743 H690 V805"></path>
+  <path class="flow-line" d="M550 843 H230 V895"></path>
+  <path class="flow-line" d="M230 985 L230 1030"></path>
+  <text class="flow-label" x="245" y="1015">完成选择</text>
+  <path class="flow-line" d="M120 940 L55 940 L55 563 L90 563"></path>
+  <text class="flow-label" x="66" y="925">继续调整</text>
+  <path class="flow-line" d="M370 1059 H690 V1120"></path>
+  <path class="flow-line" d="M550 1153 H230 V1220"></path>
+</svg>
+</div>
+
+<!-- ===== 4. 功能需求 ===== -->
+<h2 id="s4">4. 功能需求</h2>
+
+<!-- 4.1 -->
+<h3>4.1 弹窗 Tab 切换</h3>
+
+<h4>4.1.1 商品选择弹窗 — Tab 栏</h4>
+<blockquote>页面路径：搭图流程 → 选择商品 → 商品选择弹窗</blockquote>
+<div class="img-placeholder">📷 页面截图：[待补充]</div>
+
+<div class="card">
+  <p><strong>Tab 标签</strong></p>
+  <ul>
+    <li>Tab 栏包含两个标签：「单品选择」（左）、「套系列表」（右）</li>
+    <li>默认激活「单品选择」tab</li>
+    <li>点击未激活的 tab 标签，切换至对应 tab 并更新激活态样式</li>
+  </ul>
+</div>
+
+<div class="card">
+  <p><strong>搜索框联动</strong></p>
+  <table>
+    <tr><th>切换方向</th><th>搜索框行为</th><th>placeholder 变化</th></tr>
+    <tr><td>→ 套系 tab</td><td>清空搜索框内容</td><td>→ "套系名称 / 编号 / 商品名称"</td></tr>
+    <tr><td>→ 单品 tab</td><td>恢复上次搜索关键词</td><td>→ "商品名称 / 商品ID"</td></tr>
+  </table>
+</div>
+
+<div class="card">
+  <p><strong>副标题联动</strong></p>
+  <table>
+    <tr><th>切换方向</th><th>副标题文案</th></tr>
+    <tr><td>→ 套系 tab</td><td>"直接搜索套系，浏览并选择套系中需要的商品"</td></tr>
+    <tr><td>→ 单品 tab</td><td>恢复单品 tab 原有副标题文案</td></tr>
+  </table>
+</div>
+
+<div class="card">
+  <p><strong>数据加载</strong></p>
+  <ul>
+    <li>首次切换到套系 tab 时触发套系数据请求</li>
+    <li>数据加载中展示 loading 态（建议：骨架屏或加载指示器）</li>
+    <li>数据加载失败展示错误提示，并提供"重试"操作入口</li>
+  </ul>
+</div>
+
+<!-- 4.2 -->
+<h3>4.2 套系卡片列表</h3>
+
+<h4>4.2.1 套系 tab 列表区</h4>
+<blockquote>页面路径：商品选择弹窗 → 套系列表 tab</blockquote>
+<div class="img-placeholder">📷 页面截图：[待补充]</div>
+
+<h4>列表加载与异常重试时序图</h4>
+<div class="mermaid-wrap">
+<div class="mermaid">
+sequenceDiagram
+    actor U as 用户
+    participant UI as 套系列表区
+    participant ST as 前端状态
+    participant API as 套系服务
+
+    U->>UI: 首次进入套系 tab
+    UI->>ST: 检查本地缓存
+    ST-->>UI: 展示 Loading
+    ST->>API: 请求套系数据
+    alt 请求成功
+        API-->>ST: 返回套系列表
+        ST->>ST: 缓存数据
+        ST-->>UI: 渲染套系卡片
+    else 请求失败
+        API-->>ST: 返回错误
+        ST-->>UI: 展示错误提示与「重试」
+        U->>UI: 点击重试
+        UI->>ST: 重新发起请求
+        ST->>API: 请求套系数据
+        API-->>ST: 返回结果
+        ST-->>UI: 渲染列表或继续展示错误
+    end
+</div>
+</div>
+
+<h4>数据来源 — 接口字段模型</h4>
+<div class="mermaid-wrap">
+<div class="mermaid">
+erDiagram
+    Suite ||--|{ SkuItem : "包含"
+
+    Suite {
+        string suiteId PK "套系唯一编号"
+        string suiteName "套系名称"
+    }
+
+    SkuItem {
+        string skuid PK "SKU 唯一标识"
+        string skuSpec "SKU 规格描述文本"
+        string imageUrl "商品图片完整 URL"
+        string kind "角色：main=主商品，suite=配套商品"
+    }
+</div>
+</div>
+
+<blockquote>逻辑数据模型：一个套系包含一个或多个 SKU。接口采用嵌套 JSON 返回时，<code>skuItems</code> 作为 Suite 的子数组承载该关系，无需在每个 SKU 中重复返回 <code>suiteId</code>。</blockquote>
+
+<div class="card">
+  <p><strong>接口字段说明</strong></p>
+  <table class="field-table">
+    <tr><th>字段</th><th>类型</th><th>所属</th><th>说明</th></tr>
+    <tr><td>suiteId</td><td>string</td><td>Suite</td><td>套系唯一编号</td></tr>
+    <tr><td>suiteName</td><td>string</td><td>Suite</td><td>套系名称</td></tr>
+    <tr><td>skuItems</td><td>array</td><td>Suite</td><td>套系包含的 SKU 列表</td></tr>
+    <tr><td>skuid</td><td>string</td><td>SkuItem</td><td>SKU 唯一标识</td></tr>
+    <tr><td>skuSpec</td><td>string</td><td>SkuItem</td><td>SKU 规格描述文本（直接展示，不做截断）</td></tr>
+    <tr><td>imageUrl</td><td>string</td><td>SkuItem</td><td>商品图片完整 URL</td></tr>
+    <tr><td>kind</td><td>string</td><td>SkuItem</td><td>角色：<code>main</code>=主商品，<code>suite</code>=配套商品</td></tr>
+  </table>
+</div>
+
+<h4>套系卡片结构</h4>
+<div class="suite-wireframe" aria-label="套系卡片页面结构示意">
+  <div class="suite-header"><strong>现代简约卧室套系</strong><span class="suite-id">套系编号：ST-1024</span></div>
+  <div class="sku-strip">
+    <div class="sku-mini"><div class="sku-image"><span class="sku-main">主</span><span class="sku-check">✓</span>商品图</div><div class="sku-spec">1.8m 真皮软床</div></div>
+    <div class="sku-mini"><div class="sku-image"><span class="sku-check">✓</span>商品图</div><div class="sku-spec">床头柜 · 胡桃色</div></div>
+    <div class="sku-mini"><div class="sku-image">商品图</div><div class="sku-spec">四门衣柜 · 2.0m</div></div>
+    <div class="sku-mini"><div class="sku-image">商品图</div><div class="sku-spec">梳妆台 · 组合款</div></div>
+  </div>
+</div>
+
+<div class="card">
+  <ul>
+    <li><strong>卡片头部</strong>：左侧展示套系名称，右侧展示套系编号</li>
+    <li><strong>SKU 横向滚动条</strong>：展示该套系下所有 SKU 的缩略图卡片，支持水平滑动浏览；内容宽度不超出容器时不显示滚动条</li>
+  </ul>
+</div>
+
+<h4>搜索过滤</h4>
+<div class="swimlane-chart" aria-label="套系搜索过滤泳道图">
+  <table class="swimlane-table">
+    <tr><th>角色 / 阶段</th><th>输入</th><th>预处理</th><th>匹配</th><th>结果</th></tr>
+    <tr><td>用户</td><td class="step-cell"><span class="step-no">1</span><br>输入关键词</td><td class="empty-cell">—</td><td class="empty-cell">—</td><td class="step-cell"><span class="step-no">5</span><br>查看过滤结果</td></tr>
+    <tr><td>前端过滤逻辑</td><td class="empty-cell">—</td><td class="step-cell"><span class="step-no">2</span><br>去除首尾空格，统一大小写</td><td class="step-cell"><span class="step-no">3</span><br>匹配 suiteName、suiteId、skuSpec</td><td class="empty-cell">—</td></tr>
+    <tr><td>列表视图</td><td class="empty-cell">—</td><td class="empty-cell">—</td><td class="empty-cell">—</td><td class="step-cell"><span class="step-no">4</span><br>有匹配则展示套系；无匹配则展示空状态</td></tr>
+  </table>
+</div>
+
+<div class="card">
+  <ul>
+    <li>搜索框输入关键词后，对已加载的套系列表进行前端过滤</li>
+    <li>匹配范围：套系名称、套系编号、套系内任一 SKU 的规格描述（skuSpec）</li>
+    <li>匹配规则：不区分大小写，包含即匹配</li>
+    <li>过滤后无结果时，列表区展示空状态文案："未找到相关套系，换个关键词试试"</li>
+  </ul>
+</div>
+
+<!-- 4.3 -->
+<h3>4.3 SKU 卡片</h3>
+
+<h4>4.3.1 套系 tab — SKU 卡片</h4>
+<div class="img-placeholder">📷 页面截图：[待补充]</div>
+
+<div class="card">
+  <p><strong>卡片元素（从上到下）</strong></p>
+  <table>
+    <tr><th>序号</th><th>元素</th><th>说明</th></tr>
+    <tr><td>1</td><td>商品图片</td><td>展示 <code>imageUrl</code>；加载失败展示占位图</td></tr>
+    <tr><td>2</td><td>「主」标签</td><td>仅当 <code>kind === "main"</code> 时展示，位于图片区域角标位置</td></tr>
+    <tr><td>3</td><td>勾选按钮 (✓)</td><td>点击切换选中/未选中状态；达上限时禁用</td></tr>
+    <tr><td>4</td><td>规格描述</td><td>展示 <code>skuSpec</code>，单行省略</td></tr>
+  </table>
+</div>
+
+<h4>SKU 勾选交互时序图</h4>
+<div class="mermaid-wrap">
+<div class="mermaid">
+sequenceDiagram
+    actor U as 用户
+    participant C as SKU 卡片
+    participant ST as 选择状态
+    participant B as 底部已选区
+
+    U->>C: 点击勾选按钮
+    C->>ST: 查询是否已选及当前数量
+    alt 当前 SKU 已选中
+        ST->>ST: 从 selected 中移除
+        ST-->>C: 恢复默认态
+        ST-->>B: 移除对应缩略图
+    else 未选中且未达上限
+        ST->>ST: 加入 selected，并记录 suiteId
+        ST-->>C: 展示选中态与高亮
+        ST-->>B: 新增缩略图并更新数量
+    else 未选中但已达上限
+        ST-->>C: 保持未选中
+        ST-->>U: toast 提示最多选择 N 张
+    end
+</div>
+</div>
+
+<h4>勾选限制规则</h4>
+<div class="card">
+  <table>
+    <tr><th>当前条件</th><th>系统处理</th><th>页面反馈</th></tr>
+    <tr><td>SKU 已选中</td><td>从已选集合移除</td><td>卡片恢复默认态，底部移除缩略图</td></tr>
+    <tr><td>SKU 未选中，且未达上限</td><td>加入已选集合并记录来源套系</td><td>卡片高亮，底部新增缩略图</td></tr>
+    <tr><td>SKU 未选中，但已达上限</td><td>不修改已选集合</td><td>按钮不响应，toast 提示最多选择 N 张</td></tr>
+  </table>
+</div>
+
+<div class="card">
+  <p><strong>与单品 tab 的一致性</strong></p>
+  <ul>
+    <li>套系 tab 的 SKU 勾选/取消勾选逻辑与单品 tab 完全一致</li>
+    <li>数量上限规则与单品 tab 共用同一配置</li>
+    <li>「确定」后选中的套系 SKU 进入与单品 SKU 相同的后续处理流程</li>
+    <li>套系 SKU 选中的数据额外记录来源套系编号（<code>suiteId</code>）用于追溯</li>
+  </ul>
+</div>
+
+<!-- 4.4 -->
+<h3>4.4 底部已选区与确定按钮</h3>
+
+<h4>4.4.1 商品选择弹窗 — 底部操作栏</h4>
+<div class="img-placeholder">📷 页面截图：[待补充]</div>
+
+<div class="ui-wireframe" aria-label="底部操作栏页面结构示意">
+  <div class="wf-footer">
+    <span class="wf-picked">已选：🖼️　🖼️　🖼️</span>
+    <span class="wf-button">已选 3 张，确定</span>
+  </div>
+</div>
+
+<div class="card">
+  <p><strong>已选区</strong></p>
+  <ul>
+    <li>展示当前 tab 已选中的 SKU 商品缩略图，横向排列</li>
+    <li>套系 tab 的已选区展示逻辑与单品 tab 一致</li>
+    <li>无选择时展示"暂无选择"占位文案</li>
+    <li>切换 tab 时，已选区展示对应 tab 的已选商品</li>
+  </ul>
+</div>
+
+<div class="card">
+  <p><strong>确定按钮状态</strong></p>
+  <table>
+    <tr><th>条件</th><th>按钮文案</th><th>按钮状态</th></tr>
+    <tr><td>已选数量 = 0</td><td>"确定"</td><td>置灰禁用</td></tr>
+    <tr><td>已选数量 &gt; 0</td><td>"已选N张，确定"</td><td>可点击</td></tr>
+  </table>
+</div>
+
+<h4>确认提交流程</h4>
+<div class="mermaid-wrap">
+<div class="mermaid">
+sequenceDiagram
+    actor U as 用户
+    participant UI as 商品选择弹窗
+    participant ST as 前端选择状态
+    participant D as 搭图流程
+
+    U->>UI: 点击确定
+    UI->>ST: 读取当前 activeTab
+    alt 单品选择 tab
+        ST->>ST: 读取 productSelection.selected
+    else 套系列表 tab
+        ST->>ST: 读取 suiteSelection.selected
+    end
+    ST->>ST: 统一转换为后续流程所需 SKU 数据
+    ST->>D: 传入已选 SKU
+    D-->>UI: 接收成功
+    UI-->>U: 关闭弹窗并进入后续搭图
+</div>
+</div>
+
+<!-- ===== 5. 验收标准 ===== -->
+<h2 id="s5">5. 验收标准</h2>
+
+<h3>5.1 Tab 切换</h3>
+<ul class="checklist">
+  <li>打开商品选择弹窗，默认激活「单品选择」tab</li>
+  <li>点击「套系列表」tab，切换至套系列表视图，搜索框清空、placeholder 和副标题变为套系专属文案</li>
+  <li>从套系 tab 切回单品 tab，单品 tab 的搜索关键词和已选状态保持不变</li>
+</ul>
+
+<h3>5.2 数据加载</h3>
+<ul class="checklist">
+  <li>首次进入套系 tab 时，展示 loading 状态</li>
+  <li>套系数据加载成功后，正确渲染所有套系卡片及 SKU</li>
+  <li>接口请求失败时，展示错误提示并提供重试入口；点击重试可重新请求</li>
+</ul>
+
+<h3>5.3 套系卡片展示</h3>
+<ul class="checklist">
+  <li>每个套系卡片正确展示：套系名称、套系编号、SKU 横向滚动条</li>
+  <li>SKU 横向滚动条可正常水平滑动</li>
+  <li>SKU 图片正确加载展示；图片加载失败时展示占位图</li>
+  <li><code>kind</code> 为 <code>"main"</code> 的 SKU 正确展示「主」标签，非 <code>"main"</code> 的 SKU 不展示</li>
+  <li>SKU 规格描述文本完整展示（单行省略）</li>
+</ul>
+
+<h3>5.4 搜索过滤</h3>
+<ul class="checklist">
+  <li>输入套系名称关键词，正确过滤出匹配的套系</li>
+  <li>输入套系编号关键词，正确过滤出匹配的套系</li>
+  <li>输入 SKU 规格中的关键词，正确过滤出包含该 SKU 的套系</li>
+  <li>搜索不区分大小写</li>
+  <li>无匹配结果时展示"未找到相关套系，换个关键词试试"</li>
+  <li>清空搜索框后恢复展示全部套系</li>
+</ul>
+
+<h3>5.5 SKU 勾选</h3>
+<ul class="checklist">
+  <li>点击 SKU 勾选按钮可选中，按钮变为选中态，底部已选区出现对应缩略图</li>
+  <li>再次点击已选中的勾选按钮可取消选中，按钮恢复默认态，底部已选区移除对应缩略图</li>
+  <li>已选数量达到上限时，未选中 SKU 的勾选按钮置灰不可点击</li>
+  <li>已达上限时点击禁用按钮，toast 提示"最多选择N张"</li>
+  <li>已达上限时，已选中的 SKU 仍可取消勾选</li>
+</ul>
+
+<h3>5.6 确定按钮</h3>
+<ul class="checklist">
+  <li>无选中时，按钮展示"确定"且置灰禁用</li>
+  <li>有选中时，按钮展示"已选N张，确定"且可点击</li>
+  <li>点击确定后，套系 tab 选中的 SKU 进入后续搭图流程，处理逻辑与单品 tab 一致</li>
+  <li>套系 SKU 选中数据中包含来源套系编号（<code>suiteId</code>）用于追溯</li>
+</ul>
+
+<h3>5.7 兼容性</h3>
+<ul class="checklist">
+  <li>单品 tab 原有全部功能不受影响</li>
+  <li>已有的"系统推荐搭配商品"区域（单品 tab 内）展示和交互不受影响</li>
+</ul>
+
+</div>
+
+<script>
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'default',
+    themeVariables: {
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif',
+      fontSize: '14px',
+      primaryColor: '#eff6ff',
+      primaryBorderColor: '#2563eb',
+      primaryTextColor: '#1a1a2e',
+      lineColor: '#94a3b8',
+      secondaryColor: '#f8fafc',
+      tertiaryColor: '#fff7ed',
+    },
+    er: { useMaxWidth: true },
+  });
+</script>
+</body>
+</html>
